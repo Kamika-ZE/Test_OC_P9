@@ -13,10 +13,10 @@ public class EcritureComptableTest {
         BigDecimal vDebit = pDebit == null ? null : new BigDecimal(pDebit);
         BigDecimal vCredit = pCredit == null ? null : new BigDecimal(pCredit);
         String vLibelle = ObjectUtils.defaultIfNull(vDebit, BigDecimal.ZERO)
-                                     .subtract(ObjectUtils.defaultIfNull(vCredit, BigDecimal.ZERO)).toPlainString();
+                                  .subtract(ObjectUtils.defaultIfNull(vCredit, BigDecimal.ZERO)).toPlainString();
         LigneEcritureComptable vRetour = new LigneEcritureComptable(new CompteComptable(pCompteComptableNumero),
-                                                                    vLibelle,
-                                                                    vDebit, vCredit);
+                vLibelle,
+                vDebit, vCredit);
         return vRetour;
     }
 
@@ -39,6 +39,44 @@ public class EcritureComptableTest {
         vEcriture.getListLigneEcriture().add(this.createLigne(2, null, "30"));
         vEcriture.getListLigneEcriture().add(this.createLigne(2, "1", "2"));
         Assert.assertFalse(vEcriture.toString(), vEcriture.isEquilibree());
+    }
+
+    @Test
+    public void getTotalDebit(){
+        EcritureComptable vEcriture = new EcritureComptable();
+
+        vEcriture.getListLigneEcriture().add(this.createLigne(1, "200.50", null));
+        vEcriture.getListLigneEcriture().add(this.createLigne(1, "100.50", "33"));
+        vEcriture.getListLigneEcriture().add(this.createLigne(2, null, "301"));
+        vEcriture.getListLigneEcriture().add(this.createLigne(2, "40", "7"));
+
+        BigDecimal vRetour = BigDecimal.ZERO;
+        for (LigneEcritureComptable vLigneEcritureComptable : vEcriture.getListLigneEcriture()) {
+            if (vLigneEcritureComptable.getDebit() != null) {
+                vRetour = vRetour.add(vLigneEcritureComptable.getDebit());
+            }
+        }
+
+        Assert.assertTrue("Test getTotalDebit", vEcriture.getTotalDebit().equals(vRetour));
+    }
+
+    @Test
+    public void getTotalCredit(){
+        EcritureComptable vEcriture = new EcritureComptable();
+
+        vEcriture.getListLigneEcriture().add(this.createLigne(1, "200.50", null));
+        vEcriture.getListLigneEcriture().add(this.createLigne(1, "100.50", "33"));
+        vEcriture.getListLigneEcriture().add(this.createLigne(2, null, "301"));
+        vEcriture.getListLigneEcriture().add(this.createLigne(2, "40", "7"));
+
+        BigDecimal vRetour = BigDecimal.ZERO;
+        for (LigneEcritureComptable vLigneEcritureComptable : vEcriture.getListLigneEcriture()) {
+            if (vLigneEcritureComptable.getCredit() != null) {
+                vRetour = vRetour.add(vLigneEcritureComptable.getCredit());
+            }
+        }
+
+        Assert.assertTrue("Test getTotalCredit", vEcriture.getTotalCredit().equals(vRetour));
     }
 
 }
