@@ -53,6 +53,18 @@
         <!-- ===== Version properties ===== -->
         <log4j.version>2.8.1</log4j.version>
         <spring.version>4.3.7.RELEASE</spring.version>
+
+        <!-- ===== Sonar Cloud properties ===== -->
+        <sonar.projectKey>Kamika-ZE_TEST_OC_P9</sonar.projectKey>
+        <sonar.organization>kamika-ze</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.login>d8835cba94cdb9f3049144cdf375a880ea0f87bd</sonar.login>
+        <sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
+        <sonar.language>java</sonar.language>
+        <sonar.moduleKey>${project.artifactId}</sonar.moduleKey>
+        <sonar.branch.name>develop</sonar.branch.name>
+        <aggregate.report.dir>myerp-report/target/site/jacoco-aggregate/jacoco.xml</aggregate.report.dir>
+
     </properties>
 
 
@@ -64,6 +76,7 @@
         <module>myerp-model</module>
         <module>myerp-consumer</module>
         <module>myerp-business</module>
+        <module>myerp-report</module>
     </modules>
 
 
@@ -136,6 +149,11 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>myerp-business</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>myerp-report</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -375,8 +393,29 @@
                     <artifactId>build-helper-maven-plugin</artifactId>
                     <version>1.10</version>
                 </plugin>
+
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>0.8.5</version>
+                </plugin>
             </plugins>
         </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 
 

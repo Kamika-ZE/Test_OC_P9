@@ -41,5 +41,10 @@
       <option name="name" value="JBoss Community repository" />
       <option name="url" value="https://repository.jboss.org/nexus/content/repositories/public/" />
     </remote-repository>
+    <remote-repository>
+      <option name="id" value="project.local" />
+      <option name="name" value="project.local" />
+      <option name="url" value="file://D:\Projets\IdeaProjects\TEST_OC_P9\src\myerp-report/../src/lib/" />
+    </remote-repository>
   </component>
 </project>
