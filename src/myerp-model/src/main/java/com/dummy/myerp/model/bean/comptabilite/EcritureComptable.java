@@ -116,9 +116,9 @@ public class EcritureComptable {
 
         if (compare == 0){
             return true;
-        } else {
-            return false;
         }
+        return false;
+
     }
 
     // ==================== Méthodes ====================
