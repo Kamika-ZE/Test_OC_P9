@@ -111,13 +111,7 @@ public class EcritureComptable {
      */
     public boolean isEquilibree() {
         // On compare des BigDecimal. On utilise compareTo
-
-        int compare = this.getTotalDebit().compareTo(getTotalCredit());
-
-        if (compare == 0){
-            return true;
-        }
-        return false;
+        return this.getTotalDebit().compareTo(getTotalCredit()) == 0;
 
     }
 
