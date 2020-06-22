@@ -9,6 +9,8 @@ import org.junit.Test;
 
 public class EcritureComptableTest {
 
+    private EcritureComptable vEcriture = new EcritureComptable();
+
     private LigneEcritureComptable createLigne(Integer pCompteComptableNumero, String pDebit, String pCredit) {
         BigDecimal vDebit = pDebit == null ? null : new BigDecimal(pDebit);
         BigDecimal vCredit = pCredit == null ? null : new BigDecimal(pCredit);
@@ -22,9 +24,6 @@ public class EcritureComptableTest {
 
     @Test
     public void isEquilibree() {
-        EcritureComptable vEcriture;
-        vEcriture = new EcritureComptable();
-
         vEcriture.setLibelle("Equilibrée");
         vEcriture.getListLigneEcriture().add(this.createLigne(1, "200.50", null));
         vEcriture.getListLigneEcriture().add(this.createLigne(1, "100.50", "33"));
@@ -43,7 +42,6 @@ public class EcritureComptableTest {
 
     @Test
     public void getTotalDebit(){
-        EcritureComptable vEcriture = new EcritureComptable();
 
         vEcriture.getListLigneEcriture().add(this.createLigne(1, "200.50", null));
         vEcriture.getListLigneEcriture().add(this.createLigne(1, "100.50", "33"));
@@ -62,7 +60,6 @@ public class EcritureComptableTest {
 
     @Test
     public void getTotalCredit(){
-        EcritureComptable vEcriture = new EcritureComptable();
 
         vEcriture.getListLigneEcriture().add(this.createLigne(1, "200.50", null));
         vEcriture.getListLigneEcriture().add(this.createLigne(1, "100.50", "33"));
@@ -77,6 +74,12 @@ public class EcritureComptableTest {
         }
 
         Assert.assertTrue("Test getTotalCredit", vEcriture.getTotalCredit().equals(vRetour));
+    }
+
+    @Test
+    public void getReference(){
+        vEcriture.setReference("BQ-2020/00003");
+        Assert.assertTrue("La référence ne respecte pas le format \"XX-AAAA/#####\"", vEcriture.getReference().matches("\\D{1,5}-\\d{4}/\\d{5}"));
     }
 
 }

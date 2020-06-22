@@ -1,22 +1,39 @@
 package com.dummy.myerp.model.bean.comptabilite;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 public class JournalComptableTest {
 
-    private JournalComptable journalComptable;
+    private static List<JournalComptable> vList;
+
+    @BeforeClass
+    public static void setUpBeforeClass() {
+        vList = new ArrayList<>(0);
+    }
 
     @Before
-    public void initJournalComptable(){
-        journalComptable = new JournalComptable();
-        journalComptable.setCode("AC");
-        journalComptable.setLibelle("Achat");
+    public void initJournalComptableList(){
+        vList.add(new JournalComptable("AC", "Achat"));
+        vList.add(new JournalComptable("BQ", "Banque"));
+    }
+
+    @Test
+    public void getJournalByCodeShouldReturnJournal(){
+        assertEquals(JournalComptable.getByCode(vList, "AC"), vList.get(0));
     }
 
     @Test
     public void testJournalComptableToString(){
-        Assert.assertEquals("JournalComptable{code='AC', libelle='Achat'}", journalComptable.toString());
+        assertEquals("JournalComptable{code='AC', libelle='Achat'}", vList.get(0).toString());
+    }
+
+    @After
+    public void clearList() {
+        vList.clear();
     }
 }

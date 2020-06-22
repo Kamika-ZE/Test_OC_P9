@@ -51,7 +51,7 @@
         <application.name>MyERP</application.name>
 
         <!-- ===== Version properties ===== -->
-        <log4j.version>2.8.1</log4j.version>
+        <log4j.version>2.12.1</log4j.version>
         <spring.version>4.3.7.RELEASE</spring.version>
 
         <!-- ===== Sonar Cloud properties ===== -->
@@ -267,6 +267,22 @@
                 <version>4.12</version>
                 <scope>test</scope>
             </dependency>
+
+            <!-- https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter -->
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>3.3.3</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-test</artifactId>
+                <version>${spring.version}</version>
+                <scope>test</scope>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 

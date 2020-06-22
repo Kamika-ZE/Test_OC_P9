@@ -62,23 +62,23 @@ public class ComptabiliteManagerImpl extends AbstractBusinessManager implements 
     // TODO à tester
     @Override
     public synchronized void addReference(EcritureComptable pEcritureComptable) {
-        // TODO à implémenter
-        // Bien se réferer à la JavaDoc de cette méthode !
+
+        // Bien se référer à la JavaDoc de cette méthode !
         /* Le principe :
-                1.  Remonter depuis la persitance la dernière valeur de la séquence du journal pour l'année de l'écriture
+                1.  Remonter depuis la persistance la dernière valeur de la séquence du journal pour l'année de l'écriture
                     (table sequence_ecriture_comptable)
                 2.  * S'il n'y a aucun enregistrement pour le journal pour l'année concernée :
                         1. Utiliser le numéro 1.
                     * Sinon :
                         1. Utiliser la dernière valeur + 1
                 3.  Mettre à jour la référence de l'écriture avec la référence calculée (RG_Compta_5)
-                4.  Enregistrer (insert/update) la valeur de la séquence en persitance
+                4.  Enregistrer (insert/update) la valeur de la séquence en persistance
                     (table sequence_ecriture_comptable)
          */
-        /*1.  Remonter depuis la persitance la dernière valeur de la séquence du journal pour l'année de l'écriture
+        /*1.  Remonter depuis la persistance la dernière valeur de la séquence du journal pour l'année de l'écriture
                             (table sequence_ecriture_comptable)
          Remonter depuis la persistance la dernière valeur de la séquence du journal pour l'année de l'écriture
-         implémenter un moyen de récupérer le dernier numéro de séquence. la séquence représent l'année + le numéro chrono
+         implémenter un moyen de récupérer le dernier numéro de séquence. la séquence représente l'année + le numéro chrono
          pour la regex on obtient : codeJournal-annéeSequence/valeurSequence
          */
         // nouvelle séquence
@@ -88,7 +88,7 @@ public class ComptabiliteManagerImpl extends AbstractBusinessManager implements 
         Date date = pEcritureComptable.getDate();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
-        int ecritureYear = calendar.get(Calendar.YEAR);
+        Integer ecritureYear = calendar.get(Calendar.YEAR);
         // journal visé
         String journalCode = pEcritureComptable.getJournal().getCode();
 
@@ -118,7 +118,6 @@ public class ComptabiliteManagerImpl extends AbstractBusinessManager implements 
         }
 
         /*  3.  Mettre à jour la référence de l'écriture avec la référence calculée (RG_Compta_5)
-
          */
         // On formate la référence en respectant la RG_Compta_5
         String updateReference = journalCode + "-" + ecritureYear + "/" + String.format("%05d", newSequenceEcritureComptable.getDerniereValeur());
@@ -127,17 +126,12 @@ public class ComptabiliteManagerImpl extends AbstractBusinessManager implements 
         pEcritureComptable.setReference(updateReference);
 
         // Lancement Transaction
-        TransactionStatus vTS = getTransactionManager().beginTransactionMyERP();
-        try {
-            if (newSequenceEcritureComptable.getDerniereValeur() == 1) {
-                getDaoProxy().getComptabiliteDao().insertSequenceEcritureComptable(newSequenceEcritureComptable);
-            } else {
-                getDaoProxy().getComptabiliteDao().updateSequenceEcritureComptable(newSequenceEcritureComptable);
-            }
-            getTransactionManager().commitMyERP(vTS);
-            vTS = null;
-        } finally {
-            getTransactionManager().rollbackMyERP(vTS);
+        if (newSequenceEcritureComptable.getDerniereValeur() == 1) {
+            insertSequenceEcritureComptable(newSequenceEcritureComptable);
+            getDaoProxy().getComptabiliteDao().insertSequenceEcritureComptable(newSequenceEcritureComptable);
+        } else {
+            updateSequenceEcritureComptable(newSequenceEcritureComptable);
+            getDaoProxy().getComptabiliteDao().updateSequenceEcritureComptable(newSequenceEcritureComptable);
         }
     }
 
@@ -154,7 +148,7 @@ public class ComptabiliteManagerImpl extends AbstractBusinessManager implements 
 
     /**
      * Vérifie que l'Ecriture comptable respecte les règles de gestion unitaires,
-     * c'est à dire indépendemment du contexte (unicité de la référence, exercie comptable non cloturé...)
+     * c'est à dire indépendemment du contexte (unicité de la référence, exercice comptable non clôturé...)
      *
      * @param pEcritureComptable -
      * @throws FunctionalException Si l'Ecriture comptable ne respecte pas les règles de gestion
@@ -171,84 +165,23 @@ public class ComptabiliteManagerImpl extends AbstractBusinessManager implements 
         }
 
         // ===== RG_Compta_2 : Pour qu'une écriture comptable soit valide, elle doit être équilibrée
-        if (!pEcritureComptable.isEquilibree()) {
-            throw new FunctionalException("L'écriture comptable n'est pas équilibrée.");
-        }
+        regleGestion2(pEcritureComptable);
+
 
         // ===== RG_Compta_3 : une écriture comptable doit avoir au moins 2 lignes d'écriture (1 au débit, 1 au crédit)
-        int vNbrCredit = 0;
-        int vNbrDebit = 0;
-        for (LigneEcritureComptable vLigneEcritureComptable : pEcritureComptable.getListLigneEcriture()) {
-            if (BigDecimal.ZERO.compareTo(ObjectUtils.defaultIfNull(vLigneEcritureComptable.getCredit(),
-                    BigDecimal.ZERO)) != 0) {
-                vNbrCredit++;
-            }
-            if (BigDecimal.ZERO.compareTo(ObjectUtils.defaultIfNull(vLigneEcritureComptable.getDebit(),
-                    BigDecimal.ZERO)) != 0) {
-                vNbrDebit++;
-            }
-        }
-        // On test le nombre de lignes car si l'écriture à une seule ligne
-        //      avec un montant au débit et un montant au crédit ce n'est pas valable
-        if (pEcritureComptable.getListLigneEcriture().size() < 2
-                    || vNbrCredit < 1
-                    || vNbrDebit < 1) {
-            throw new FunctionalException(
-                    "L'écriture comptable doit avoir au moins deux lignes : une ligne au débit et une ligne au crédit.");
-        }
+        regleGestion3(pEcritureComptable);
+
 
         // TODO ===== RG_Compta_5 : Format et contenu de la référence
-        // vérifier que l'année dans la référence correspond bien à la date de l'écriture, idem pour le code journal...
         // ===== RG_Compta_5 : La référence d'une écriture comptable est composée du code du journal dans lequel
-        // figure l'écriture suivi de l'année et d'un numéro de séquence (propre à chaque journal) sur 5 chiffres
-        // incrémenté automatiquement à chaque écriture. Le formatage de la référence est : XX-AAAA/#####.
-        // vérifier que l'année dans la référence correspond bien à la date de l'écriture, idem pour le code journal...
-        // regex à tester
-        String regex = "\\D{1,5}-\\d{4}/\\d{5}";
-        Pattern pattern = Pattern.compile(regex);
-        // On récupère la référence
-        String referenceEcriture = pEcritureComptable.getReference();
-        Matcher matcher = pattern.matcher(referenceEcriture);
-        //on teste la regex
-        if (!matcher.matches()){
-            throw new FunctionalException("La référence de l'écriture ne respecte pas le format.");
-        }
-        //
-        // On split la référence
-        String [] splitReferenceEcriture = referenceEcriture.split("[\\-/]");
-        //récupérer le code du journal
-        String journalCode = pEcritureComptable.getJournal().getCode();
-
-        // On vérifie la correspondance du code journal
-        if (!journalCode.equals(splitReferenceEcriture[0])){
-            throw new FunctionalException("Le code journal de la référence est différent du code journal de l'écriture.");
-        }
-
-        //récupérer l'année de l'écriture
-        Date date = pEcritureComptable.getDate();
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        String ecritureYear = String.valueOf(calendar.get(Calendar.YEAR));
-
-        // On vérifie la correspondance du code journal
-        if (!ecritureYear.equals(splitReferenceEcriture[1])){
-            throw new FunctionalException("La date de la référence est différente de la date de l'écriture.");
-        }
-
-        //récupérer le numéro chrono de l'écriture
-        String numSequence = StringUtils.right(referenceEcriture, 5);
-
-        // On vérifie la correspondance du code journal
-        if (!numSequence.equals(splitReferenceEcriture[2])){
-            throw new FunctionalException("La séquence de la référence est différente de la séquence de l'écriture.");
-        }
+        regleGestion5(pEcritureComptable);
     }
 
 
     /**
      * Vérifie que l'Ecriture comptable respecte les règles de gestion liées au contexte
      * (unicité de la référence, année comptable non cloturé...)
-     *
+     *  RG_Compta_6 : La référence d'une écriture comptable doit être unique
      * @param pEcritureComptable -
      * @throws FunctionalException Si l'Ecriture comptable ne respecte pas les règles de gestion
      */
@@ -316,6 +249,148 @@ public class ComptabiliteManagerImpl extends AbstractBusinessManager implements 
             vTS = null;
         } finally {
             getTransactionManager().rollbackMyERP(vTS);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void insertSequenceEcritureComptable(SequenceEcritureComptable pSequenceEcritureComptable) {
+        TransactionStatus vTS = getTransactionManager().beginTransactionMyERP();
+        try {
+            getDaoProxy().getComptabiliteDao().insertSequenceEcritureComptable(pSequenceEcritureComptable);
+            getTransactionManager().commitMyERP(vTS);
+            vTS = null;
+        } finally {
+            getTransactionManager().rollbackMyERP(vTS);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateSequenceEcritureComptable(SequenceEcritureComptable pSequenceEcritureComptable) {
+        TransactionStatus vTS = getTransactionManager().beginTransactionMyERP();
+        try {
+            getDaoProxy().getComptabiliteDao().updateSequenceEcritureComptable(pSequenceEcritureComptable);
+            getTransactionManager().commitMyERP(vTS);
+            vTS = null;
+        } finally {
+            getTransactionManager().rollbackMyERP(vTS);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void deleteSequenceEcritureComptable(SequenceEcritureComptable pSequenceEcritureComptable) {
+        TransactionStatus vTS = getTransactionManager().beginTransactionMyERP();
+        try {
+            getDaoProxy().getComptabiliteDao().deleteSequenceEcritureComptable(pSequenceEcritureComptable);
+            getTransactionManager().commitMyERP(vTS);
+            vTS = null;
+        } finally {
+            getTransactionManager().rollbackMyERP(vTS);
+        }
+    }
+
+
+
+    /**
+     * RG_Compta_2 : Pour qu'une écriture comptable soit valide, elle doit être équilibrée
+     * @param pEcritureComptable
+     * @throws FunctionalException
+     */
+    public void regleGestion2(EcritureComptable pEcritureComptable) throws FunctionalException{
+        if (!pEcritureComptable.isEquilibree()) {
+            throw new FunctionalException("L'écriture comptable n'est pas équilibrée.");
+        }
+    }
+
+    /**
+     * RG_Compta_3 : une écriture comptable doit avoir au moins 2 lignes d'écriture (1 au débit, 1 au crédit)
+     * @param pEcritureComptable
+     * @throws FunctionalException
+     */
+    public void regleGestion3(EcritureComptable pEcritureComptable) throws FunctionalException{
+        int vNbrCredit = 0;
+        int vNbrDebit = 0;
+        for (LigneEcritureComptable vLigneEcritureComptable : pEcritureComptable.getListLigneEcriture()) {
+            if (BigDecimal.ZERO.compareTo(ObjectUtils.defaultIfNull(vLigneEcritureComptable.getCredit(),
+                    BigDecimal.ZERO)) != 0) {
+                vNbrCredit++;
+            }
+            if (BigDecimal.ZERO.compareTo(ObjectUtils.defaultIfNull(vLigneEcritureComptable.getDebit(),
+                    BigDecimal.ZERO)) != 0) {
+                vNbrDebit++;
+            }
+        }
+        // On test le nombre de lignes car si l'écriture à une seule ligne
+        //      avec un montant au débit et un montant au crédit ce n'est pas valable
+        if (pEcritureComptable.getListLigneEcriture().size() < 2
+                    || vNbrCredit < 1
+                    || vNbrDebit < 1) {
+            throw new FunctionalException(
+                    "L'écriture comptable doit avoir au moins deux lignes : une ligne au débit et une ligne au crédit.");
+        }
+    }
+
+    /**
+     * RG_Compta_4 : Les montants des lignes d'écriture sont signés et peuvent prendre des valeurs négatives (même si cela est peu fréquent).
+     * @param pLigneEcritureComptable
+     * @throws FunctionalException
+     */
+    public void regleGestion4(LigneEcritureComptable pLigneEcritureComptable) throws FunctionalException{
+        //TODO implémenter RG 4 ?
+    }
+
+    /**
+     * RG_Compta_5 : La référence d'une écriture comptable est composée du code du journal dans lequel
+     * figure l'écriture suivi de l'année et d'un numéro de séquence (propre à chaque journal) sur 5 chiffres
+     * incrémenté automatiquement à chaque écriture. Le formatage de la référence est : XX-AAAA/#####.
+     * @param pEcritureComptable
+     * @throws FunctionalException
+     */
+    public void regleGestion5(EcritureComptable pEcritureComptable) throws FunctionalException{
+        String regex = "\\D{1,5}-\\d{4}/\\d{5}";
+        Pattern pattern = Pattern.compile(regex);
+        // On récupère la référence
+        String referenceEcriture = pEcritureComptable.getReference();
+        Matcher matcher = pattern.matcher(referenceEcriture);
+        //on teste la regex
+        if (!matcher.matches()){
+            throw new FunctionalException("La référence de l'écriture ne respecte pas le format.");
+        }
+        //
+        // On split la référence
+        String [] splitReferenceEcriture = referenceEcriture.split("[\\-/]");
+        //récupérer le code du journal
+        String journalCode = pEcritureComptable.getJournal().getCode();
+
+        // On vérifie la correspondance du code journal
+        if (!journalCode.equals(splitReferenceEcriture[0])){
+            throw new FunctionalException("Le code journal de la référence est différent du code journal de l'écriture.");
+        }
+
+        //récupérer l'année de l'écriture
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(pEcritureComptable.getDate());
+        String ecritureYear = String.valueOf(calendar.get(Calendar.YEAR));
+
+        // On vérifie la correspondance du code journal
+        if (!ecritureYear.equals(splitReferenceEcriture[1])){
+            throw new FunctionalException("La date de la référence est différente de la date de l'écriture.");
+        }
+
+        //récupérer le numéro chrono de l'écriture
+        String numSequence = StringUtils.right(referenceEcriture, 5);
+
+        // On vérifie la correspondance du code journal
+        if (!numSequence.equals(splitReferenceEcriture[2])){
+            throw new FunctionalException("La séquence de la référence est différente de la séquence de l'écriture.");
         }
     }
 }
