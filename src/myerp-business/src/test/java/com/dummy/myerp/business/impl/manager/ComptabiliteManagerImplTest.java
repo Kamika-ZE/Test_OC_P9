@@ -1,15 +1,14 @@
 package com.dummy.myerp.business.impl.manager;
 
-import java.math.BigDecimal;
-import java.util.Date;
-
-import org.apache.logging.log4j.Logger;
-import org.junit.Test;
 import com.dummy.myerp.model.bean.comptabilite.CompteComptable;
 import com.dummy.myerp.model.bean.comptabilite.EcritureComptable;
 import com.dummy.myerp.model.bean.comptabilite.JournalComptable;
 import com.dummy.myerp.model.bean.comptabilite.LigneEcritureComptable;
 import com.dummy.myerp.technical.exception.FunctionalException;
+import org.junit.Test;
+
+import java.math.BigDecimal;
+import java.util.Date;
 
 public class ComptabiliteManagerImplTest {
 
@@ -73,6 +72,7 @@ public class ComptabiliteManagerImplTest {
         manager.regleGestion3(vEcritureComptable);
     }
 
+    //test regex
     @Test(expected = FunctionalException.class)
     public void checkEcritureComptableUnitRG5WhenSequenceTooLong() throws Exception{
         EcritureComptable vEcritureComptable;
@@ -86,13 +86,25 @@ public class ComptabiliteManagerImplTest {
     }
 
     @Test(expected = FunctionalException.class)
-    public void RG5ShouldReturnExceptionWhenYearNotMatch() throws Exception{
+    public void shouldReturnExceptionWhenYearNotMatchRG5() throws Exception{
         EcritureComptable vEcritureComptable;
         vEcritureComptable = new EcritureComptable();
         vEcritureComptable.setJournal(new JournalComptable("AC", "Achat"));
         vEcritureComptable.setDate(new Date());
         vEcritureComptable.setLibelle("Libelle");
         vEcritureComptable.setReference("AC-2018/000001");
+
+        manager.regleGestion5(vEcritureComptable);
+    }
+
+    @Test(expected = FunctionalException.class)
+    public void shouldReturnExceptionWhenJournalCodeNotMatchRG5() throws Exception{
+        EcritureComptable vEcritureComptable;
+        vEcritureComptable = new EcritureComptable();
+        vEcritureComptable.setJournal(new JournalComptable("AC", "Achat"));
+        vEcritureComptable.setDate(new Date());
+        vEcritureComptable.setLibelle("Libelle");
+        vEcritureComptable.setReference("ABN-2020/00001");
 
         manager.regleGestion5(vEcritureComptable);
     }

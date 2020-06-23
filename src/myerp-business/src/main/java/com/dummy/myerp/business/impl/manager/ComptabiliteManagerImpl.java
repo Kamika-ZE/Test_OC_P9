@@ -172,7 +172,7 @@ public class ComptabiliteManagerImpl extends AbstractBusinessManager implements 
         regleGestion3(pEcritureComptable);
 
 
-        // TODO ===== RG_Compta_5 : Format et contenu de la référence
+
         // ===== RG_Compta_5 : La référence d'une écriture comptable est composée du code du journal dans lequel
         regleGestion5(pEcritureComptable);
     }
@@ -336,15 +336,6 @@ public class ComptabiliteManagerImpl extends AbstractBusinessManager implements 
             throw new FunctionalException(
                     "L'écriture comptable doit avoir au moins deux lignes : une ligne au débit et une ligne au crédit.");
         }
-    }
-
-    /**
-     * RG_Compta_4 : Les montants des lignes d'écriture sont signés et peuvent prendre des valeurs négatives (même si cela est peu fréquent).
-     * @param pLigneEcritureComptable
-     * @throws FunctionalException
-     */
-    public void regleGestion4(LigneEcritureComptable pLigneEcritureComptable) throws FunctionalException{
-        //TODO implémenter RG 4 ?
     }
 
     /**
