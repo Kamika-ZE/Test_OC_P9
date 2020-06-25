@@ -375,13 +375,5 @@ public class ComptabiliteManagerImpl extends AbstractBusinessManager implements 
         if (!ecritureYear.equals(splitReferenceEcriture[1])){
             throw new FunctionalException("La date de la référence est différente de la date de l'écriture.");
         }
-
-        //récupérer le numéro chrono de l'écriture
-        String numSequence = StringUtils.right(referenceEcriture, 5);
-
-        // On vérifie la correspondance du code journal
-        if (!numSequence.equals(splitReferenceEcriture[2])){
-            throw new FunctionalException("La séquence de la référence est différente de la séquence de l'écriture.");
-        }
     }
 }
