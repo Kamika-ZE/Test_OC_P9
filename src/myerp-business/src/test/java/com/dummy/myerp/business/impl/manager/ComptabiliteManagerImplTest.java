@@ -6,8 +6,13 @@ import com.dummy.myerp.consumer.dao.contrat.ComptabiliteDao;
 import com.dummy.myerp.consumer.dao.contrat.DaoProxy;
 import com.dummy.myerp.model.bean.comptabilite.*;
 import com.dummy.myerp.technical.exception.FunctionalException;
+import com.dummy.myerp.technical.exception.NotFoundException;
+import org.apache.commons.lang3.ObjectUtils;
+import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -16,8 +21,9 @@ import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ComptabiliteManagerImplTest {
@@ -38,6 +44,15 @@ public class ComptabiliteManagerImplTest {
 
     private EcritureComptable vEcritureComptable;
 
+    private LigneEcritureComptable createLigne(Integer pCompteComptableNumero, String pDebit, String pCredit) {
+        BigDecimal vDebit = pDebit == null ? null : new BigDecimal(pDebit);
+        BigDecimal vCredit = pCredit == null ? null : new BigDecimal(pCredit);
+        String vLibelle = ObjectUtils.defaultIfNull(vDebit, BigDecimal.ZERO)
+                                  .subtract(ObjectUtils.defaultIfNull(vCredit, BigDecimal.ZERO)).toPlainString();
+        return new LigneEcritureComptable(new CompteComptable(pCompteComptableNumero),
+                vLibelle,
+                vDebit, vCredit);
+    }
 
     @Before
     public void setUpMockDao() {
@@ -59,6 +74,7 @@ public class ComptabiliteManagerImplTest {
                 null, null,
                 new BigDecimal(123)));
         manager.checkEcritureComptableUnit(vEcritureComptable);
+
     }
 
     @Test(expected = FunctionalException.class)
@@ -155,14 +171,18 @@ public class ComptabiliteManagerImplTest {
         manager.regleGestion5(vEcritureComptable);
     }
 
-    @Test(expected = FunctionalException.class)
-    public void shouldReturnExceptionWhenJournalCodeNotMatchRG5() throws Exception{
+    @Test
+    public void shouldReturnExceptionWhenJournalCodeNotMatchRG5(){
         vEcritureComptable.setJournal(new JournalComptable("AC", "Achat"));
         vEcritureComptable.setDate(new Date());
         vEcritureComptable.setLibelle("Libelle");
         vEcritureComptable.setReference("ABN-2020/00001");
+        try{
+            manager.regleGestion5(vEcritureComptable);
+            fail("FunctionalException not thrown");
+        } catch (FunctionalException e){
 
-        manager.regleGestion5(vEcritureComptable);
+        }
     }
 
     @Test
@@ -186,9 +206,92 @@ public class ComptabiliteManagerImplTest {
 
         manager.addReference(vEcritureComptable);
 
-        assertEquals("AC-2020/00010", vEcritureComptable.getReference());
+        assertEquals("AC-2020/00009", vEcritureComptable.getReference());
+    }
 
-        //verify(comptabiliteDao).insertSequenceEcritureComptable(Matchers.any(), Matchers.eq("AC"));
+
+    @Test
+    public void addReferenceShouldInsertNewSequence(){
+        vEcritureComptable.setJournal(new JournalComptable("AC", "Achat"));
+        vEcritureComptable.setDate(new Date());
+        vEcritureComptable.setLibelle("Libelle");
+        vEcritureComptable.getListLigneEcriture().add(new LigneEcritureComptable(new CompteComptable(1, "test"),
+                null, new BigDecimal(1234),
+                null));
+        vEcritureComptable.getListLigneEcriture().add(new LigneEcritureComptable(new CompteComptable(2, "test"),
+                null, null,
+                new BigDecimal(1234)));
+        Date date = vEcritureComptable.getDate();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        Integer ecritureYear = calendar.get(Calendar.YEAR);
+        String journalCode = "AC";
+
+        when(comptabiliteDao.getLastSequenceEcritureComptable(journalCode, ecritureYear)).thenReturn(null);
+
+        manager.addReference(vEcritureComptable);
+
+        assertEquals("AC-2020/00001", vEcritureComptable.getReference());
+    }
+
+    @Test
+    public void shouldReturnFunctionalExceptionWhenEcritureComptableIdIsDifferentFromDbRG6() throws NotFoundException {
+        vEcritureComptable.setJournal(new JournalComptable("AC", "Achat"));
+        vEcritureComptable.setDate(new Date());
+        vEcritureComptable.setLibelle("Libelle");
+        vEcritureComptable.setReference("AC-2020/00001");
+        vEcritureComptable.setId(1);
+        EcritureComptable returnedEcritureComptable = new EcritureComptable();
+        returnedEcritureComptable.setId(vEcritureComptable.getId() + 1); // not the same id !!
+        returnedEcritureComptable.setReference(vEcritureComptable.getReference());
+
+        when(comptabiliteDao.getEcritureComptableByRef(vEcritureComptable.getReference()))
+                .thenReturn(returnedEcritureComptable);
+        try{
+            manager.checkEcritureComptableContext(vEcritureComptable);
+            fail("FunctionalException not thrown");
+        } catch (FunctionalException exception){
+            assertEquals("Une autre écriture comptable existe déjà avec la même référence.", exception.getMessage());
+        }
+    }
+
+    @Test
+    public void shouldNotReturnFunctionalExceptionWhenEcritureComptableIdIsSameFromDbRG6() throws NotFoundException, FunctionalException {
+        vEcritureComptable.setJournal(new JournalComptable("AC", "Achat"));
+        vEcritureComptable.setDate(new Date());
+        vEcritureComptable.setLibelle("Libelle");
+        vEcritureComptable.setReference("AC-2020/00001");
+        vEcritureComptable.setId(1);
+
+        when(comptabiliteDao.getEcritureComptableByRef(vEcritureComptable.getReference()))
+                .thenReturn(vEcritureComptable);
+        manager.checkEcritureComptableContext(vEcritureComptable);
+    }
+
+    @Test
+    public void shouldNotReturnFunctionalExceptionIfEcritureComptableNotFoundInDb() throws NotFoundException, FunctionalException {
+        lenient().when(comptabiliteDao.getEcritureComptableByRef(anyString())).thenThrow(NotFoundException.class);
+        manager.checkEcritureComptableContext(vEcritureComptable);
+    }
+
+    @Test
+    public void shouldNotReturnFunctionalExceptionWhenCheckEcritureComptable() throws NotFoundException, FunctionalException {
+        vEcritureComptable.setId(1);
+        vEcritureComptable.setJournal(new JournalComptable("AC", "Achat"));
+        vEcritureComptable.setDate(new Date());
+        vEcritureComptable.setLibelle("Libelle");
+        vEcritureComptable.setReference("AC-2020/00001");
+        vEcritureComptable.getListLigneEcriture().add(this.createLigne(1, "200.50", null));
+        vEcritureComptable.getListLigneEcriture().add(this.createLigne(1, "100.50", "33"));
+        vEcritureComptable.getListLigneEcriture().add(this.createLigne(2, null, "301"));
+        vEcritureComptable.getListLigneEcriture().add(this.createLigne(2, "40", "7"));
+        when(comptabiliteDao.getEcritureComptableByRef(anyString())).thenThrow(NotFoundException.class);
+        manager.checkEcritureComptable(vEcritureComptable);
+    }
+
+    @After
+    public void clearEcritureComptable() {
+        vEcritureComptable = null;
     }
 
 
