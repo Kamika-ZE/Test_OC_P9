@@ -12,7 +12,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class ConsumerIntegrationtest extends ConsumerTestCase {
+public class ConsumerIntegrationTest extends ConsumerTestCase {
 
     @Test
     public void getListCompteComptable() {
@@ -122,62 +122,8 @@ public class ConsumerIntegrationtest extends ConsumerTestCase {
     }
 
 
-    @Test
-    public void deleteEcritureComptable() throws ParseException {
-        EcritureComptable vEcritureComptable;
-        vEcritureComptable = new EcritureComptable();
-        vEcritureComptable.setId(-2);
-        vEcritureComptable.setJournal(new JournalComptable("VE", "Vente"));
-        SimpleDateFormat pattern = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        vEcritureComptable.setDate(pattern.parse("2016-12-30 00:00:00"));
-        vEcritureComptable.setLibelle("TMA Appli Xxx");
-        SimpleDateFormat df = new SimpleDateFormat("yyyy");
-        String refYear = df.format(vEcritureComptable.getDate());
-        vEcritureComptable.setReference(vEcritureComptable.getJournal().getCode() + "-" + refYear + "/00002");
-        vEcritureComptable.getListLigneEcriture().add(new LigneEcritureComptable(new CompteComptable(401),
-                null, new BigDecimal(200),
-                null));
-        vEcritureComptable.getListLigneEcriture().add(new LigneEcritureComptable(new CompteComptable(411),
-                null, null,
-                new BigDecimal(200)));
-
-        int sizeinit = getDaoProxy().getComptabiliteDao().getListEcritureComptable().size();
-        getDaoProxy().getComptabiliteDao().deleteEcritureComptable(vEcritureComptable.getId());
-        int sizefinal = getDaoProxy().getComptabiliteDao().getListEcritureComptable().size();
-        assertEquals(sizeinit - 1, sizefinal);
-    }
 
 
-    @Test
-    public void getDerniereSequenceEcritureComptable() {
-        assertEquals("SequenceEcritureComptable{annee=2016, derniereValeur=51}", getDaoProxy().getComptabiliteDao().getLastSequenceEcritureComptable("BQ", 2016).toString());
-
-    }
 
 
-    @Test
-    public void insertSequenceEcritureComptable() throws NotFoundException {
-
-        SequenceEcritureComptable seq = new SequenceEcritureComptable();
-        EcritureComptable e;
-        String codej;
-
-        //insert
-        seq.setAnnee(2018);
-        seq.setDerniereValeur(100);
-        e = getDaoProxy().getComptabiliteDao().getEcritureComptable(-3);
-        codej = e.getJournal().getCode();
-        seq.setJournalCode(codej);
-        getDaoProxy().getComptabiliteDao().insertSequenceEcritureComptable(seq);
-
-        //update
-        seq = new SequenceEcritureComptable();
-        seq.setAnnee(2017);
-        seq.setDerniereValeur(41);
-        e = getDaoProxy().getComptabiliteDao().getEcritureComptable(-3);
-        codej = e.getJournal().getCode();
-        seq.setJournalCode(codej);
-        getDaoProxy().getComptabiliteDao().updateSequenceEcritureComptable(seq);
-        assertEquals("SequenceEcritureComptable{annee=2017, derniereValeur=41}", getDaoProxy().getComptabiliteDao().getLastSequenceEcritureComptable("BQ",2017).toString());
-    }
 }
