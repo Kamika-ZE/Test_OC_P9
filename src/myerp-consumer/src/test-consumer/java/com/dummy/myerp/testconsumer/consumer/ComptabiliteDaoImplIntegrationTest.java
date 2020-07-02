@@ -12,7 +12,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class ConsumerIntegrationTest extends ConsumerTestCase {
+public class ComptabiliteDaoImplIntegrationTest extends ConsumerTestCase {
 
     @Test
     public void getListCompteComptable() {
