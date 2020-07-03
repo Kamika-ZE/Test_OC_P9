@@ -92,6 +92,17 @@ public interface ComptabiliteDao {
     List<SequenceEcritureComptable> getListSequenceEcritureComptable();
 
     /**
+     * Renvoi la Sequence d'écriture comptable correspondante au Journal comptable pour l'année donnée
+     *
+     * @param pJournalCode -
+     * @param pCurrentYear -
+     * @return {@link SequenceEcritureComptable}
+     * @throws NotFoundException Si la séquence n'est pas trouvée
+     */
+    SequenceEcritureComptable getSequenceEcritureComptable(String pJournalCode, int pCurrentYear) throws NotFoundException;
+
+
+    /**
      * Insert une nouvelle séquence d'écriture comptable.
      *
      * @param sequence -
@@ -104,22 +115,5 @@ public interface ComptabiliteDao {
      * @param sequence -
      */
     void updateSequenceEcritureComptable(SequenceEcritureComptable sequence);
-
-    /**
-     * Renvoi la dernière Sequence d'écriture comptable correspondante au Journal comptable pour l'année d'écriture donnée
-     *
-     * @param pJournalCode -
-     * @param pYear -
-     * @return {@link SequenceEcritureComptable}
-     *
-     */
-    SequenceEcritureComptable getLastSequenceEcritureComptable(String pJournalCode, int pYear);
-
-    /**
-     * Supprime la séquence de l'écriture comptable.
-     *
-     * @param sequence -
-     */
-    void deleteSequenceEcritureComptable(SequenceEcritureComptable sequence);
 
 }

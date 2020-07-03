@@ -97,12 +97,12 @@
             </value>
         </property>
 
-        <property name="SQLgetLastSequenceEcritureComptable">
+        <property name="SQLgetSequenceEcritureComptable">
             <value>
-                SELECT * FROM myerp.sequence_ecriture_comptable
-                WHERE journal_code= :journal_code
+                SELECT *
+                FROM myerp.sequence_ecriture_comptable
+                WHERE journal_code = :journal_code
                 AND annee = :annee
-                AND derniere_valeur=(SELECT max(derniere_valeur) FROM myerp.sequence_ecriture_comptable)
             </value>
         </property>
 
@@ -118,12 +118,9 @@
 
         <property name="SQLupdateSequenceEcritureComptable">
             <value>
-                UPDATE myerp.sequence_ecriture_comptable SET
-                journal_code = :journal_code,
-                annee = :annee,
-                derniere_valeur = :derniere_valeur
-                WHERE
-                journal_code = :journal_code AND annee = :annee
+                UPDATE myerp.sequence_ecriture_comptable
+                SET derniere_valeur = :derniere_valeur
+                WHERE journal_code = :journal_code AND annee = :annee
             </value>
         </property>
     </bean>

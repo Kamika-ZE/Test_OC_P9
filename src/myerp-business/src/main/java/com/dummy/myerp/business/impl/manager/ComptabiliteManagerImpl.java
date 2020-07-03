@@ -92,10 +92,14 @@ public class ComptabiliteManagerImpl extends AbstractBusinessManager implements 
         // journal visé
         String journalCode = pEcritureComptable.getJournal().getCode();
 
-
-        SequenceEcritureComptable sequenceEcritureComptableInBdd = getDaoProxy()
-                                                                           .getComptabiliteDao()
-                                                                           .getLastSequenceEcritureComptable(journalCode, ecritureYear);
+        SequenceEcritureComptable sequenceEcritureComptableInBdd;
+        try {
+            sequenceEcritureComptableInBdd = getDaoProxy()
+                                                     .getComptabiliteDao()
+                                                     .getSequenceEcritureComptable(journalCode, ecritureYear);
+        } catch (NotFoundException e){
+            sequenceEcritureComptableInBdd = null;
+        }
 
         /*2.  * S'il n'y a aucun enregistrement pour le journal pour l'année concernée :
                 Utiliser le numéro 1.
@@ -278,22 +282,6 @@ public class ComptabiliteManagerImpl extends AbstractBusinessManager implements 
             getTransactionManager().rollbackMyERP(vTS);
         }
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void deleteSequenceEcritureComptable(SequenceEcritureComptable pSequenceEcritureComptable) {
-        TransactionStatus vTS = getTransactionManager().beginTransactionMyERP();
-        try {
-            getDaoProxy().getComptabiliteDao().deleteSequenceEcritureComptable(pSequenceEcritureComptable);
-            getTransactionManager().commitMyERP(vTS);
-            vTS = null;
-        } finally {
-            getTransactionManager().rollbackMyERP(vTS);
-        }
-    }
-
 
 
     /**

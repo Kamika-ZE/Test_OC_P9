@@ -98,10 +98,4 @@ public interface ComptabiliteManager {
      */
     void updateSequenceEcritureComptable(SequenceEcritureComptable pSequenceEcritureComptable);
 
-    /**
-     * Supprime la sequence d'ecriture comptable  {@code pSequenceEcritureComptable}.
-     *
-     * @param pSequenceEcritureComptable la sequence à supprimer
-     */
-    void deleteSequenceEcritureComptable(SequenceEcritureComptable pSequenceEcritureComptable);
 }

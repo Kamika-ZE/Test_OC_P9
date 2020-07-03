@@ -22,7 +22,8 @@
 	INSERT INTO MYERP.compte_comptable (numero, libelle) VALUES (	512,	'Banque'	);				
 	INSERT INTO MYERP.compte_comptable (numero, libelle) VALUES (	606,	'Achats non stockés de matières et fournitures'	);				
 	INSERT INTO MYERP.compte_comptable (numero, libelle) VALUES (	706,	'Prestations de services'	);				
-								
+	INSERT INTO MYERP.compte_comptable (numero, libelle) VALUES (	777,	'Test integration'	);
+
 								
 								
 								
@@ -36,7 +37,8 @@
 --		VE	Vente					
 --		BQ	Banque					
 --		OD	Opérations Diverses					
---								
+--		TE	Tests
+--
 --	journal_comptable							
 --								
 --		code	libelle					
@@ -45,7 +47,8 @@
 	INSERT INTO MYERP.journal_comptable (code, libelle) VALUES (	'VE',	'Vente'	);				
 	INSERT INTO MYERP.journal_comptable (code, libelle) VALUES (	'BQ',	'Banque'	);				
 	INSERT INTO MYERP.journal_comptable (code, libelle) VALUES (	'OD',	'Opérations Diverses'	);				
-								
+	INSERT INTO MYERP.journal_comptable (code, libelle) VALUES (	'TE',	'Tests'	);
+
 								
 								
 								
@@ -59,7 +62,8 @@
 --		VE	2016	41				
 --		BQ	2016	51				
 --		OD	2016	88				
---								
+--		TE	2020	10
+--
 --	sequence_ecriture_comptable							
 --								
 --		journal_code	annee	derniere_valeur				
@@ -68,7 +72,8 @@
 	INSERT INTO MYERP.sequence_ecriture_comptable (journal_code, annee, derniere_valeur) values (	'VE',	2016,	41	);			
 	INSERT INTO MYERP.sequence_ecriture_comptable (journal_code, annee, derniere_valeur) values (	'BQ',	2016,	51	);			
 	INSERT INTO MYERP.sequence_ecriture_comptable (journal_code, annee, derniere_valeur) values (	'OD',	2016,	88	);			
-								
+	INSERT INTO MYERP.sequence_ecriture_comptable (journal_code, annee, derniere_valeur) values (	'TE',	2020,	10	);
+
 								
 								
 								
@@ -83,7 +88,8 @@
 --		-3	BQ	BQ-2016/00003	29/12/16	Paiement Facture F110001		
 --		-4	VE	VE-2016/00004	28/12/16	TMA Appli Yyy		
 --		-5	BQ	BQ-2016/00005	27/12/16	Paiement Facture C110002		
---								
+--		-6	TE	TE-2020/00010	03/07/20	Test
+--
 --	ecriture_comptable							
 --								
 --		id	journal_code	reference	date	libelle		
@@ -93,7 +99,8 @@
 	INSERT INTO MYERP.ecriture_comptable (id,journal_code,reference,date,libelle) VALUES (	-3,	'BQ',	'BQ-2016/00003',	'2016-12-29',	'Paiement Facture F110001'	);	
 	INSERT INTO MYERP.ecriture_comptable (id,journal_code,reference,date,libelle) VALUES (	-4,	'VE',	'VE-2016/00004',	'2016-12-28',	'TMA Appli Yyy'	);	
 	INSERT INTO MYERP.ecriture_comptable (id,journal_code,reference,date,libelle) VALUES (	-5,	'BQ',	'BQ-2016/00005',	'2016-12-27',	'Paiement Facture C110002'	);	
-								
+	INSERT INTO MYERP.ecriture_comptable (id,journal_code,reference,date,libelle) VALUES (	-6,	'TE',	'TE-2020/00010',	'2020-07-03',	'Test'	);
+
 								
 								
 								
@@ -115,8 +122,10 @@
 --		-4	2	706	TMA Appli Xxx		4750	
 --		-4	3	4457	TVA 20%		950	
 --		-5	1	512		3000		
---		-5	2	411			3000	
---								
+--		-5	2	411			3000
+--		-6	1	777	Test ligne 1		3000
+--		-6	2	777	Test ligne 2		3000
+--
 --	ligne_ecriture_comptable							
 --								
 --		ecriture_id	ligne_id	compte_comptable_numero	libelle	debit	credit	
@@ -134,3 +143,5 @@
 	INSERT INTO MYERP.ligne_ecriture_comptable (ecriture_id,ligne_id,compte_comptable_numero,libelle,debit,credit) VALUES (	-4,	3,	4457,	'TVA 20%',	null,	950	);
 	INSERT INTO MYERP.ligne_ecriture_comptable (ecriture_id,ligne_id,compte_comptable_numero,libelle,debit,credit) VALUES (	-5,	1,	512,	null,	3000,	null	);
 	INSERT INTO MYERP.ligne_ecriture_comptable (ecriture_id,ligne_id,compte_comptable_numero,libelle,debit,credit) VALUES (	-5,	2,	411,	null,	null,	3000	);
+	INSERT INTO MYERP.ligne_ecriture_comptable (ecriture_id,ligne_id,compte_comptable_numero,libelle,debit,credit) VALUES (	-6,	1,	777,	'Test ligne 1',	3000, null	);
+	INSERT INTO MYERP.ligne_ecriture_comptable (ecriture_id,ligne_id,compte_comptable_numero,libelle,debit,credit) VALUES (	-6,	2,	777,	'Test ligne 2',	null,	3000	);

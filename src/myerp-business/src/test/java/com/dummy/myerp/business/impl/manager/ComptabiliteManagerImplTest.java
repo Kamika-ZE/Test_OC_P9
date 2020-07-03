@@ -10,9 +10,7 @@ import com.dummy.myerp.technical.exception.NotFoundException;
 import org.apache.commons.lang3.ObjectUtils;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -21,9 +19,11 @@ import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ComptabiliteManagerImplTest {
@@ -186,7 +186,7 @@ public class ComptabiliteManagerImplTest {
     }
 
     @Test
-    public void addReference(){
+    public void addReference() throws NotFoundException {
         vEcritureComptable.setJournal(new JournalComptable("AC", "Achat"));
         vEcritureComptable.setDate(new Date());
         vEcritureComptable.setLibelle("Libelle");
@@ -202,7 +202,7 @@ public class ComptabiliteManagerImplTest {
         Integer ecritureYear = calendar.get(Calendar.YEAR);
         String journalCode = "AC";
 
-        when(comptabiliteDao.getLastSequenceEcritureComptable(journalCode, ecritureYear)).thenReturn(new SequenceEcritureComptable(journalCode, ecritureYear, 8));
+        when(comptabiliteDao.getSequenceEcritureComptable(journalCode, ecritureYear)).thenReturn(new SequenceEcritureComptable(journalCode, ecritureYear, 8));
 
         manager.addReference(vEcritureComptable);
 
@@ -211,7 +211,7 @@ public class ComptabiliteManagerImplTest {
 
 
     @Test
-    public void addReferenceShouldInsertNewSequence(){
+    public void addReferenceShouldInsertNewSequence() throws NotFoundException {
         vEcritureComptable.setJournal(new JournalComptable("AC", "Achat"));
         vEcritureComptable.setDate(new Date());
         vEcritureComptable.setLibelle("Libelle");
@@ -227,7 +227,7 @@ public class ComptabiliteManagerImplTest {
         Integer ecritureYear = calendar.get(Calendar.YEAR);
         String journalCode = "AC";
 
-        when(comptabiliteDao.getLastSequenceEcritureComptable(journalCode, ecritureYear)).thenReturn(null);
+        when(comptabiliteDao.getSequenceEcritureComptable(journalCode, ecritureYear)).thenReturn(null);
 
         manager.addReference(vEcritureComptable);
 

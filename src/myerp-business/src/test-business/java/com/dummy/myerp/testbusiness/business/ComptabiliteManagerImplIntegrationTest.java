@@ -41,7 +41,7 @@ public class ComptabiliteManagerImplIntegrationTest extends BusinessTestCase {
 
 
 
-    /*@Test
+    @Test
     public void checkEcritureComptable() throws FunctionalException {
         EcritureComptable vEcritureComptable = new EcritureComptable();
 
@@ -60,7 +60,7 @@ public class ComptabiliteManagerImplIntegrationTest extends BusinessTestCase {
 
 
         comptabiliteManager.checkEcritureComptable(vEcritureComptable);
-    }*/
+    }
 
 
     /*@Test
