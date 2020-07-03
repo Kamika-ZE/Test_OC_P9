@@ -62,7 +62,7 @@
         <sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
         <sonar.language>java</sonar.language>
         <sonar.moduleKey>${project.artifactId}</sonar.moduleKey>
-        <sonar.branch.name>develop</sonar.branch.name>
+        <!--<sonar.branch.name>develop</sonar.branch.name>-->
         <aggregate.report.dir>myerp-report/target/site/jacoco-aggregate/jacoco.xml</aggregate.report.dir>
 
 
