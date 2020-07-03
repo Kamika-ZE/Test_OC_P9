@@ -1,0 +1,38 @@
+language: java
+
+jdk:
+  - openjdk8
+
+sudo: required
+
+services:
+  - docker
+
+before_install:
+  - cd docker/dev
+  - docker-compose up -d
+  - docker ps -a
+
+before_script:
+  - cd ../../src
+
+script:
+
+  # the following command line builds the project, runs the tests with coverage and then execute the SonarCloud analysis
+  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent verify -Ptest-consumer,test-business sonar:sonar
+  - cd ../docker/dev
+  - docker-compose stop
+  - docker-compose rm -f
+  - docker-compose up -d
+  - docker ps -a
+  - cd ../../src
+
+
+notifications:
+  email: false
+
+addons:
+  sonarcloud:
+    organization: "kamika-ze"
+    token:
+      secure: d86c18a0433e50067d9a946bc8c675a4d5e1c120 # encrypted value of your token

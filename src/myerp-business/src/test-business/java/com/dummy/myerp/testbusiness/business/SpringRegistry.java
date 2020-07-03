@@ -1,11 +1,11 @@
 package com.dummy.myerp.testbusiness.business;
 
+import com.dummy.myerp.business.contrat.BusinessProxy;
+import com.dummy.myerp.business.impl.TransactionManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import com.dummy.myerp.business.contrat.BusinessProxy;
-import com.dummy.myerp.business.impl.TransactionManager;
 
 
 /**
@@ -13,19 +13,27 @@ import com.dummy.myerp.business.impl.TransactionManager;
  */
 public final class SpringRegistry {
 
-    /** Logger Log4j pour la classe */
+    /**
+     * Logger Log4j pour la classe
+     */
     private static final Logger LOGGER = LogManager.getLogger(SpringRegistry.class);
 
 
-    /** Instance unique de la classe (design pattern Singleton) */
+    /**
+     * Instance unique de la classe (design pattern Singleton)
+     */
     private static final SpringRegistry INSTANCE = new SpringRegistry();
 
 
-    /** Nom des fichiers de contexte de l'application */
+    /**
+     * Nom des fichiers de contexte de l'application
+     */
     private static final String CONTEXT_APPLI_LOCATION
-        = "classpath:/com/dummy/myerp/testbusiness/business/bootstrapContext.xml";
+            = "classpath:/com/dummy/myerp/testbusiness/business/testContext.xml";
 
-    /** Le context spring de l'application */
+    /**
+     * Le context spring de l'application
+     */
     private ApplicationContext contextAppli;
 
 
