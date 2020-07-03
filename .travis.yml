@@ -33,4 +33,4 @@ addons:
   sonarcloud:
     organization: "kamika-ze"
     token:
-      secure: d86c18a0433e50067d9a946bc8c675a4d5e1c120 # encrypted value of your token
+      secure: d8835cba94cdb9f3049144cdf375a880ea0f87bd # encrypted value of your token
