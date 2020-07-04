@@ -1,5 +1,7 @@
 # MyERP
-
+[![Build Status](https://travis-ci.com/Kamika-ZE/TEST_OC_P9.svg?branch=master)](https://travis-ci.com/Kamika-ZE/TEST_OC_P9)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Kamika-ZE_TEST_OC_P9&metric=alert_status)](https://sonarcloud.io/dashboard?id=Kamika-ZE_TEST_OC_P9)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Kamika-ZE_TEST_OC_P9&metric=coverage)](https://sonarcloud.io/dashboard?id=Kamika-ZE_TEST_OC_P9)
 ## Organisation du répertoire
 
 *   `doc` : documentation
