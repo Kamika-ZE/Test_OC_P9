@@ -63,7 +63,7 @@ public class ComptabiliteManagerImplIntegrationTest extends BusinessTestCase {
     }
 
 
-    /*@Test
+    @Test
     public void checkInsertEcritureComptableReturnNoError() throws FunctionalException {
         EcritureComptable vEcritureComptable = new EcritureComptable();
         vEcritureComptable.setJournal(new JournalComptable("VE", "Vente"));
@@ -97,7 +97,7 @@ public class ComptabiliteManagerImplIntegrationTest extends BusinessTestCase {
                 }
             }
         }
-    }*/
+    }
 
     @Test(expected = FunctionalException.class)
     public void checkInsertEcritureComptableShouldReturnException() throws FunctionalException {
@@ -123,7 +123,7 @@ public class ComptabiliteManagerImplIntegrationTest extends BusinessTestCase {
         comptabiliteManager.insertEcritureComptable(vEcritureComptable);
     }
 
-/*    @Test
+    @Test
     public void checkUpdateEcritureComptableReturnNoError() throws FunctionalException {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yy-MM-dd");
         String date = "2016-12-30";
@@ -168,7 +168,7 @@ public class ComptabiliteManagerImplIntegrationTest extends BusinessTestCase {
                 }
             }
         }
-    }*/
+    }
 
     @Test(expected = FunctionalException.class)
     public void checkUpdateEcritureComptableShouldReturnException() throws FunctionalException {
